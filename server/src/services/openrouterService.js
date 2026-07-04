@@ -22,8 +22,8 @@ export const AVAILABLE_MODELS = [
     default:     false,
   },
   {
-    id:          'anthropic/claude-3.5-sonnet',
-    label:       'Claude 3.5 Sonnet',
+    id:          'anthropic/claude-sonnet-4.5',
+    label:       'Claude Sonnet 4.5',
     provider:    'Anthropic',
     description: 'Excellent at nuanced, long-form business writing',
     default:     false,
@@ -36,17 +36,17 @@ export const AVAILABLE_MODELS = [
     default:     false,
   },
   {
-    id:          'google/gemini-flash-1.5',
-    label:       'Gemini Flash 1.5',
+    id:          'google/gemini-2.5-flash',
+    label:       'Gemini 2.5 Flash',
     provider:    'Google',
     description: 'Fast multimodal model from Google DeepMind',
     default:     false,
   },
   {
-    id:          'meta-llama/llama-3.1-8b-instruct:free',
-    label:       'Llama 3.1 8B (Free)',
+    id:          'meta-llama/llama-3.1-8b-instruct',
+    label:       'Llama 3.1 8B',
     provider:    'Meta',
-    description: 'Open-source model — no cost, good for testing',
+    description: 'Open-source model — lightweight, good for testing',
     default:     false,
   },
 ];
