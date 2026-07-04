@@ -1,12 +1,78 @@
 import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Hexagon, Search, AlertCircle, FileText, Target, Package, Zap, Sparkles, Lightbulb, Swords, Link as LinkIcon, Globe, Download, MapPin, Phone, CheckCircle2, ChevronRight, Loader2, ChevronDown, Check } from 'lucide-react'
+import * as RadixSelect from '@radix-ui/react-select'
 import apiClient from './api/client'
 import './App.css'
+
+// ── Model Select (Radix UI) ───────────────────────────────────────────────────
+function ModelSelect({ models, value, onChange, disabled }) {
+  const selected = models.find((m) => m.id === value)
+  return (
+    <RadixSelect.Root value={value} onValueChange={onChange} disabled={disabled}>
+      <RadixSelect.Trigger
+        id="model-select"
+        className="model-select-trigger"
+        aria-label="AI Model"
+      >
+        <RadixSelect.Value asChild>
+          <span className="model-select-value">
+            {selected ? (
+              <>
+                <span className="model-select-label">{selected.label}</span>
+                {selected.description && (
+                  <span className="model-select-desc"> — {selected.description}</span>
+                )}
+              </>
+            ) : (
+              'Select model…'
+            )}
+          </span>
+        </RadixSelect.Value>
+        <RadixSelect.Icon className="model-select-icon">
+          <ChevronDown size={14} />
+        </RadixSelect.Icon>
+      </RadixSelect.Trigger>
+
+      <RadixSelect.Portal>
+        <RadixSelect.Content
+          className="model-select-content"
+          position="popper"
+          sideOffset={6}
+          avoidCollisions
+        >
+          <RadixSelect.Viewport className="model-select-viewport">
+            {models.map((m) => (
+              <RadixSelect.Item
+                key={m.id}
+                value={m.id}
+                className="model-select-item"
+              >
+                <RadixSelect.ItemText asChild>
+                  <span>
+                    <span className="model-item-label">{m.label}</span>
+                    {m.description && (
+                      <span className="model-item-desc"> — {m.description}</span>
+                    )}
+                  </span>
+                </RadixSelect.ItemText>
+                <RadixSelect.ItemIndicator className="model-item-check">
+                  <Check size={13} />
+                </RadixSelect.ItemIndicator>
+              </RadixSelect.Item>
+            ))}
+          </RadixSelect.Viewport>
+        </RadixSelect.Content>
+      </RadixSelect.Portal>
+    </RadixSelect.Root>
+  )
+}
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const map = {
-    ok: { color: '#10b981', label: 'Backend Online' },
-    error: { color: '#ef4444', label: 'Backend Offline' },
+    ok: { color: '#00D084', label: 'Backend Online' },
+    error: { color: '#FF4D67', label: 'Backend Offline' },
     loading: { color: '#f59e0b', label: 'Connecting…' },
   }
   const { color, label } = map[status] ?? map.loading
@@ -159,11 +225,19 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* ── Video Background ── */}
+      <div className="video-background-container">
+        <video autoPlay loop muted playsInline className="video-background">
+          <source src="/videos/background.mp4" type="video/mp4" />
+        </video>
+        <div className="video-overlay" />
+      </div>
+
       {/* ── Header ── */}
       <header className="header">
         <div className="header-inner">
           <div className="logo">
-            <span className="logo-icon">⬡</span>
+            <Hexagon className="logo-icon" size={24} />
             <span className="logo-text">Research AI</span>
           </div>
           <StatusBadge status={backendStatus} />
@@ -185,11 +259,12 @@ export default function App() {
           {/* ── Search form ── */}
           <form className="search-form" onSubmit={handleResearch} id="research-form">
             <div className="search-row">
+              <Search size={20} style={{ color: 'var(--text-muted)' }} />
               <input
                 id="company-query"
                 type="text"
                 className="search-input"
-                placeholder="e.g. Apple, Stripe, OpenAI…"
+                placeholder="Search for a company..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 disabled={loading}
@@ -201,7 +276,7 @@ export default function App() {
                 className="btn btn-primary"
                 disabled={loading || !query.trim()}
               >
-                {loading ? <><span className="spinner" /> Researching…</> : <><span>🔍</span> Research</>}
+                {loading ? <><Loader2 className="spinner-icon" size={18} /> Researching…</> : <>Research <ChevronRight size={18} /></>}
               </button>
             </div>
 
@@ -209,27 +284,54 @@ export default function App() {
             {models.length > 0 && (
               <div className="model-row">
                 <label className="model-label" htmlFor="model-select">AI Model</label>
-                <select
-                  id="model-select"
-                  className="model-select"
+                <ModelSelect
+                  models={models}
                   value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
+                  onChange={setSelectedModel}
                   disabled={loading}
-                >
-                  {models.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label} — {m.description}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             )}
           </form>
 
           {error && (
-            <div className="error-box" role="alert">
-              <span>⚠️</span> {error}
-            </div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="error-box" role="alert">
+              <AlertCircle size={18} /> {error}
+            </motion.div>
+          )}
+
+          {/* ── Feature Cards (Static) ── */}
+          {!report && !loading && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="hero-features">
+              <div className="hero-feature">
+                <div className="hf-icon"><Search size={20} /></div>
+                <div>
+                  <h4>Instant Discovery</h4>
+                  <p>Gather comprehensive data on any public company effortlessly.</p>
+                </div>
+              </div>
+              <div className="hero-feature">
+                <div className="hf-icon"><Zap size={20} /></div>
+                <div>
+                  <h4>AI Summarization</h4>
+                  <p>Leverage cutting-edge models to extract the most critical insights.</p>
+                </div>
+              </div>
+              <div className="hero-feature">
+                <div className="hf-icon"><Target size={20} /></div>
+                <div>
+                  <h4>SWOT & Competitors</h4>
+                  <p>Automatically identify strengths, weaknesses, and key rivals.</p>
+                </div>
+              </div>
+              <div className="hero-feature">
+                <div className="hf-icon"><Download size={20} /></div>
+                <div>
+                  <h4>Export Ready</h4>
+                  <p>Download clean, professional PDF reports for your meetings.</p>
+                </div>
+              </div>
+            </motion.div>
           )}
         </section>
 
@@ -237,7 +339,7 @@ export default function App() {
         {loading && (
           <section className="skeleton-section">
             <div className="progress-msg">
-              <span className="spinner" /> {progressMsg}
+              <Loader2 className="spinner-icon" size={20} /> {progressMsg}
             </div>
             {[...Array(4)].map((_, i) => (
               <div key={i} className="skeleton-card">
@@ -251,7 +353,12 @@ export default function App() {
 
         {/* ── Report ── */}
         {report && !loading && (
-          <section className="report" id="report-section">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="report" id="report-section"
+          >
             {/* ── Report header ── */}
             <div className="report-header">
               <div>
@@ -259,13 +366,13 @@ export default function App() {
                 <div className="report-meta">
                   {report.industry && <span className="tag">{report.industry}</span>}
                   {report.founded && <span className="tag">Founded {report.founded}</span>}
-                  {report.headquarters && <span className="tag">📍 {report.headquarters}</span>}
+                  {report.headquarters && <span className="tag"><MapPin size={12} /> {report.headquarters}</span>}
                   {report.officialWebsite && (
                     <a className="tag tag-link" href={report.officialWebsite} target="_blank" rel="noopener noreferrer">
-                      🌐 Website ↗
+                      <Globe size={12} /> Website <ChevronRight size={12} />
                     </a>
                   )}
-                  {report.phone && <span className="tag">📞 {report.phone}</span>}
+                  {report.phone && <span className="tag"><Phone size={12} /> {report.phone}</span>}
                   {report._model && <span className="tag tag-model">⚙ {report._model.split('/')[1]?.replace(/:.*/, '') ?? report._model}</span>}
                   {report.mock && <span className="tag tag-mock">🧪 Mock</span>}
                 </div>
@@ -276,23 +383,23 @@ export default function App() {
                 onClick={handleDownloadPdf}
                 disabled={pdfLoading}
               >
-                {pdfLoading ? <><span className="spinner" /> Generating…</> : <><span>⬇</span> Download PDF</>}
+                {pdfLoading ? <><Loader2 className="spinner-icon" size={18} /> Generating…</> : <><Download size={18} /> Download PDF</>}
               </button>
             </div>
 
             <div className="report-grid">
               {/* ── Executive Summary ── */}
               {report.summary && (
-                <div className="card card-full stagger-1">
-                  <h3 className="card-title"><span className="card-icon">📋</span> Executive Summary</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card card-full stagger-1">
+                  <h3 className="card-title"><span className="card-icon"><FileText size={16} /></span> Executive Summary</h3>
                   <p className="card-text">{report.summary}</p>
-                </div>
+                </motion.div>
               )}
 
               {/* ── SWOT Analysis ── */}
               {report.swot && (
-                <div className="card card-full stagger-2 swot-card">
-                  <h3 className="card-title"><span className="card-icon">🎯</span> SWOT Analysis</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card card-full stagger-2 swot-card">
+                  <h3 className="card-title"><span className="card-icon"><Target size={16} /></span> SWOT Analysis</h3>
                   <div className="swot-grid">
                     <div className="swot-box strength">
                       <h4>Strengths</h4>
@@ -311,13 +418,13 @@ export default function App() {
                       <ul>{report.swot.threats?.map((t, i) => <li key={i}>{t}</li>) || <li>None found</li>}</ul>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Products & Services ── */}
               {report.productsServices?.length > 0 && (
-                <div className="card">
-                  <h3 className="card-title"><span className="card-icon">📦</span> Products &amp; Services</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card">
+                  <h3 className="card-title"><span className="card-icon"><Package size={16} /></span> Products &amp; Services</h3>
                   <ul className="product-list">
                     {report.productsServices.map((p, i) => (
                       <li key={i} className="product-item">
@@ -326,28 +433,28 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Pain Points ── */}
               {report.painPoints?.length > 0 && (
-                <div className="card">
-                  <h3 className="card-title"><span className="card-icon">⚡</span> Pain Points</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card">
+                  <h3 className="card-title"><span className="card-icon"><Zap size={16} /></span> Pain Points</h3>
                   <ul className="point-list">
                     {report.painPoints.map((pt, i) => (
                       <li key={i} className="point-item">
-                        <span className="point-bullet pain">!</span>
+                        <span className="point-bullet pain"><AlertCircle size={12} /></span>
                         {pt}
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Key Highlights ── */}
               {report.keyPoints?.length > 0 && (
-                <div className="card">
-                  <h3 className="card-title"><span className="card-icon">✦</span> Key Highlights</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card">
+                  <h3 className="card-title"><span className="card-icon"><Sparkles size={16} /></span> Key Highlights</h3>
                   <ul className="point-list">
                     {report.keyPoints.map((pt, i) => (
                       <li key={i} className="point-item">
@@ -356,52 +463,52 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Recommendations ── */}
               {report.recommendations?.length > 0 && (
-                <div className="card">
-                  <h3 className="card-title"><span className="card-icon">💡</span> Recommendations</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card">
+                  <h3 className="card-title"><span className="card-icon"><Lightbulb size={16} /></span> Recommendations</h3>
                   <ul className="point-list">
                     {report.recommendations.map((rec, i) => (
                       <li key={i} className="point-item">
-                        <span className="point-bullet rec">→</span>
+                        <span className="point-bullet rec"><ChevronRight size={12} /></span>
                         {rec}
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Competitors ── */}
               {report.competitors?.length > 0 && (
-                <div className="card card-full">
-                  <h3 className="card-title"><span className="card-icon">⚔</span> Competitors</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card card-full">
+                  <h3 className="card-title"><span className="card-icon"><Swords size={16} /></span> Competitors</h3>
                   <div className="competitors-grid">
                     {report.competitors.map((c, i) => (
                       <CompetitorCard key={i} competitor={c} index={i} />
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Sources ── */}
               {report.sources?.length > 0 && (
-                <div className="card card-full">
-                  <h3 className="card-title"><span className="card-icon">🔗</span> Sources</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card card-full">
+                  <h3 className="card-title"><span className="card-icon"><LinkIcon size={16} /></span> Sources</h3>
                   <div className="sources-grid">
                     {report.sources.slice(0, 6).map((src, i) => (
                       <SourceCard key={i} source={src} index={i} />
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* ── Crawled pages ── */}
               {report.crawledPages?.length > 0 && (
-                <div className="card card-full">
-                  <h3 className="card-title"><span className="card-icon">🕷</span> Pages Crawled</h3>
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="card card-full">
+                  <h3 className="card-title"><span className="card-icon"><Globe size={16} /></span> Pages Crawled</h3>
                   <div className="crawled-grid">
                     {report.crawledPages.map((pg, i) => (
                       <a key={i} href={pg.url} target="_blank" rel="noopener noreferrer" className="crawled-pill">
@@ -410,14 +517,14 @@ export default function App() {
                       </a>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
 
             <p className="report-timestamp">
               Report generated: {new Date(report.timestamp).toLocaleString()}
             </p>
-          </section>
+          </motion.section>
         )}
       </main>
 
