@@ -103,7 +103,7 @@ export default function App() {
         try {
           const errData = await response.json();
           errText = errData.error || errText;
-        } catch(e) {}
+        } catch (e) { }
         throw new Error(errText);
       }
 
@@ -114,7 +114,7 @@ export default function App() {
       while (true) {
         const { value, done } = await reader.read()
         if (done) break
-        
+
         const chunk = decoder.decode(value, { stream: true })
         const lines = chunk.split('\n').filter(Boolean)
         for (const line of lines) {
@@ -123,7 +123,7 @@ export default function App() {
             if (data.status) setProgressMsg(data.status)
             if (data.result) finalResult = data.result
             if (data.error) throw new Error(data.error)
-          } catch(e) {
+          } catch (e) {
             // ignore parse errors for partial chunks
           }
         }
@@ -422,7 +422,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <p>All API calls are proxied through the backend — no keys exposed to the browser.</p>
+        <p>Company Research Assistant • Version 1.0.0 © 2026 Swarnadeep Singh. All Rights Reserved.</p>
       </footer>
     </div>
   )
