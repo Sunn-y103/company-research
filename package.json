@@ -1,0 +1,10 @@
+{
+  "name": "company-research-assistant-fullstack",
+  "version": "1.0.0",
+  "description": "Root package for Render Web Service deployment",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix client && npm install --prefix server",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  }
+}
