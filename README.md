@@ -2,6 +2,9 @@
 
 A full-stack web application that takes a company name or URL and automatically produces a comprehensive research report. The app searches the web, crawls the company's official website, and leverages AI to synthesize executive summaries, products and services, pain points, and a detailed competitor analysis. Users can also export the final report as a downloadable PDF.
 
+### Live Demo URL
+[https://company-research-5iwy.onrender.com](#) 
+
 ## Features
 - **Company Research Automation:** Automatically aggregates public data on any given company.
 - **Web Search Integration:** Uses Serper.dev to find the official company website and latest search snippets.
@@ -107,5 +110,3 @@ The Express backend acts as the single origin, dynamically serving the compiled 
 - **Start Command:** `npm start`
 - **Root Directory:** `.`
 
-### Live Demo URL
-[https://company-research-5iwy.onrender.com](#) 
