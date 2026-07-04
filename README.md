@@ -3,7 +3,7 @@
 A full-stack web application that takes a company name or URL and automatically produces a comprehensive research report. The app searches the web, crawls the company's official website, and leverages AI to synthesize executive summaries, products and services, pain points, and a detailed competitor analysis. Users can also export the final report as a downloadable PDF.
 
 ### Live Demo URL
-[https://company-research-5iwy.onrender.com](#) 
+https://company-research-5iwy.onrender.com
 
 ## Features
 - **Company Research Automation:** Automatically aggregates public data on any given company.
